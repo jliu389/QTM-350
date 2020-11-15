@@ -6,6 +6,8 @@
 ## Architecture Diagram
 ![Notebook instance settings](./Architecture_Diagram.png)
 
+This project retrieves data from Facebook APP Reviews API and generates controlled data for analysis. The data is stored into AWS S3 bucket and is further fed into Amazon Comprehend (ML service) for sentiment analysis. In the process, the notebook instance in JupyterLab in AWS SageMaker is used. To grant Amazon Comprehend data access permission from S3 and to grant SageMaker permission to perform analysis using API, AWS IAM is used. The sentiment result is stored back into S3 bucket. To organize the output into dataframe, Amazon Athena is used to query the result. Finally, the project utilizes python for statistical analysis. 
+
 ## Retrieving API Data
 ### Getting API and Access Token
 **42matters** provides App Reviews API for Apple App Store iOS Apps. We can get information such as dates, ratings of the app, and review contents. From [here](https://42matters.com/docs/app-market-data/ios/apps/reviews), you can sign up for free and get an access token on a 14-day trial. 
