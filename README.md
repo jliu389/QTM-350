@@ -143,11 +143,10 @@ To ensure that your file was uploaded successfully, run the following command. T
 
 Save the following trust policy as a JSON document called `comprehend-trust-policy.json` in a code or text editor. This trust policy declares Amazon Comprehend as a trusted entity and allows it to assume an IAM role.
 
+```
 {
-
   "Version": "2012-10-17",  
-  "Statement": [  
-    
+  "Statement": [      
     {    
       "Effect": "Allow",      
       "Principal": {      
@@ -157,6 +156,7 @@ Save the following trust policy as a JSON document called `comprehend-trust-poli
     }
   ]  
 }
+```
 
 To create the IAM role, run the following AWS CLI command. The command creates an IAM role called comprehend-access-role and attaches the trust policy to the role.
 
@@ -257,21 +257,20 @@ In the OutputDataConfig object, find the `S3Uri` value. And download the sentime
 ### To load the data into an AWS Glue Data Catalog
 
 To create an IAM role for AWS Glue, save the following trust policy as a JSON document called `glue-trust-policy.json`.
-
+```
 {
-
   "Version": "2012-10-17",
-  "Statement": [
-  
+  "Statement": [  
     {
       "Effect": "Allow",
       "Principal": {
         "Service": "glue.amazonaws.com"
       },
       "Action": "sts:AssumeRole"
-    }
-  ]
+    }    
+  ]  
 }
+```
 
 ```
 !aws iam create-role --role-name glue-access-role --assume-role-policy-document file:///home/ec2-user/SageMaker/glue-trust-policy.json
@@ -281,8 +280,8 @@ Save Amazon Resource Number (ARN) for the new role.
 
 Save the following IAM policy as a JSON document called `glue-access-policy.json`. The policy grants AWS Glue permission to crawl your results folders.
 
+```
 {
-
     "Version": "2012-10-17",
     "Statement": [
         {
@@ -297,6 +296,7 @@ Save the following IAM policy as a JSON document called `glue-access-policy.json
         }
     ]
 }
+```
 
 ```
 !aws iam create-policy --policy-name glue-access-policy --policy-document file:///home/ec2-user/SageMaker/glue-access-policy.json
