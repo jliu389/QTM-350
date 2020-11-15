@@ -439,6 +439,8 @@ print("p value:", p_value)
 plt.show()
 ```
 
+We get t score: -0.2975907923339247 and p value: 0.7678596979730808
+
 The outcome shows that our observation is correct. Most of the time, Amazon Comprehend is confident even though it has a wrong interpretation.
 
 ### What causes these misinterpretations?
