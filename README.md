@@ -446,6 +446,8 @@ The outcome shows that our observation is correct. Most of the time, Amazon Comp
 ### What causes these misinterpretations?
 First, we create a column marking those wrong interpretations as 1 and the others as 0. Then we build a dictionary that corresponds to the number of comments that each word appears in. By identifying all the words that appear in at least 10 comments in our dataset, we gather the 15 words that contribute the most to the failure of Amazon Comprehend and the 15 words that could best free the sentiment analyze from errors.
 
+Here we extract 2 columns from `final_dataset2.csv` into `final_dataset3.csv` to perform the analysis. 
+
 ```
 import argparse
 import numpy as np
@@ -456,7 +458,7 @@ from nltk.stem import PorterStemmer
 
 def model_assessment(filename):
     stemming = PorterStemmer()
-    myfile = pd.read_csv('final_dataset1.csv')
+    myfile = pd.read_csv('final_dataset3.csv')
     my_data = myfile["review"]
     rows = myfile.shape[0]
     num_reviews = rows
@@ -638,6 +640,7 @@ if __name__ == "__main__":
 We'll get 
 
 15 most positive words for binary dataset ['be', 'but', 'top', 'I', '“', '”', 'or', 'not', 'with', 'and', '!', 'now', 'the', 'my']
+
 15 most negative words for binary dataset ['from', 'are', 'time', 'facebook', 'post', 'of', 'it', '?', 'if', 'can', 'ha', 'left', 'app', 'have']
 
 
