@@ -1,1 +1,1 @@
-# QTM-350
+# Amazon Comprehend Project
