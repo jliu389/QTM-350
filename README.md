@@ -144,6 +144,7 @@ To ensure that your file was uploaded successfully, run the following command. T
 Save the following trust policy as a JSON document called `comprehend-trust-policy.json` in a code or text editor. This trust policy declares Amazon Comprehend as a trusted entity and allows it to assume an IAM role.
 
 {
+
   "Version": "2012-10-17",  
   "Statement": [  
     
@@ -169,7 +170,8 @@ Copy the Amazon Resource Name (ARN) and save it in a text editor. You need this 
 
 Save the following policy locally as a JSON document called `comprehend-access-policy.json`. It grants Amazon Comprehend access to the specified S3 bucket.
 
-{    
+{ 
+
     "Version": "2012-10-17",
     "Statement": [
         {
@@ -257,6 +259,7 @@ In the OutputDataConfig object, find the `S3Uri` value. And download the sentime
 To create an IAM role for AWS Glue, save the following trust policy as a JSON document called `glue-trust-policy.json`.
 
 {
+
   "Version": "2012-10-17",
   "Statement": [
   
@@ -279,6 +282,7 @@ Save Amazon Resource Number (ARN) for the new role.
 Save the following IAM policy as a JSON document called `glue-access-policy.json`. The policy grants AWS Glue permission to crawl your results folders.
 
 {
+
     "Version": "2012-10-17",
     "Statement": [
         {
