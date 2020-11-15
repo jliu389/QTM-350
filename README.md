@@ -386,7 +386,7 @@ final_dataset.to_csv('final_dataset1.csv')
 
 
 ## Evaluate the performance of Amazon Comprehend
-After looking at the data sample closely, we identify 17 clear misinterpretations of the sentiment. Most of the misinterpretation involves the unclarity between neutral and negative. For example, in one comment, the person states that: “No freedom! I can’t practice my right and freedom to express my ideas. They always remove my comments and freeze my account. No freedom anymore. Very controlling!” In this case, the comment seems extremely negative, but Amazon Comprehend identifies this statement as neutral with a confidence level of 0.93. To evaluate these misinterpretation, we created a new csv file, labeling correct outcome with 0 and incorrect outcome with 1. 
+After looking at the data sample closely, we identify 17 clear misinterpretations of the sentiment. Most of the misinterpretation involves the unclarity between neutral and negative. For example, in one comment, the person states that: “No freedom! I can’t practice my right and freedom to express my ideas. They always remove my comments and freeze my account. No freedom anymore. Very controlling!” In this case, the comment seems extremely negative, but Amazon Comprehend identifies this statement as neutral with a confidence level of 0.93. To evaluate these misinterpretation, we created a new csv file `final_dataset2.csv`, labeling correct outcome with 0 and incorrect outcome with 1. 
 
 ```
 import statistics
@@ -394,7 +394,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
-myfile = pd.read_csv('final_dataset1.csv')
+myfile = pd.read_csv('final_dataset2.csv')
 num_0 = list()
 num_1 =list()
 confidence_level_0 = list()
