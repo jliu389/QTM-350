@@ -350,19 +350,21 @@ In the Tables section, you should have one table called sentiment_results. Previ
 
 To unnest the `sentiment_results table`, enter the following query in the **Query editor** and choose **Run query**.
 
-*CREATE TABLE sentiment_results_final AS*
+```
+CREATE TABLE sentiment_results_final AS
 
-*SELECT file, line, sentiment,*
+SELECT file, line, sentiment,
 
-*sentimentscore.mixed AS mixed,*
+sentimentscore.mixed AS mixed,
 
-*sentimentscore.negative AS negative,*
+sentimentscore.negative AS negative,
 
-*sentimentscore.neutral AS neutral,*
+sentimentscore.neutral AS neutral,
 
-*sentimentscore.positive AS positive*
+sentimentscore.positive AS positive
 
-*FROM sentiment_results*
+FROM sentiment_results
+```
 
 After obtaining the results from Athena, download the csv file.
 
@@ -587,8 +589,11 @@ class Perceptron(object):
         negative = sorted(zipped, key=lambda x: x[0],reverse= False)[0:14]
         negative = [lis[1] for lis in negative]
         return positive, negative
+```
+
 ## here we sort the 15 words that contribute to rightness the most, and the 15 words that contribute the most to falsity.
 
+```
 def file_to_numpy(filename):
     """
     Read an input file and convert it to numpy
