@@ -1,9 +1,9 @@
-# Amazon Comprehend Project
+# Evaluating Amazon Machine Learning Service -- Amazon Comprehend Using Facebook App Reviews
 
 ## Overview
 
 
-## Architecture Diagram
+## Architecture Overview
 ![Notebook instance settings](./Architecture_Diagram.png)
 
 This project retrieves data from Facebook APP Reviews API and generates controlled data for analysis. The data is stored into AWS S3 bucket and is further fed into Amazon Comprehend (ML service) for sentiment analysis. In the process, the notebook instance in JupyterLab in AWS SageMaker is used. To grant Amazon Comprehend data access permission from S3 and to grant SageMaker permission to perform analysis using API, AWS IAM is used. The sentiment result is stored back into S3 bucket. To organize the output into dataframe, Amazon Athena is used to query the result. Finally, the project utilizes python for statistical analysis. 
