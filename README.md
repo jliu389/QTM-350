@@ -1,5 +1,9 @@
 # Amazon Comprehend Project
 
+## Overview
+
+## Architecture Diagram
+![Notebook instance settings](./Architecture Diagram.png.png)
 
 ## Retrieving API Data
 ### Getting API and Access Token
@@ -374,11 +378,11 @@ df2=pd.read_csv('sentiment-output-final.csv')
 df1.columns =['line', 'rating', 'review'] 
 final_dataset=pd.merge(df1, df2)
 final_dataset=final_dataset[['review', 'sentiment', 'mixed', 'negative', 'neutral', 'positive']]
-final_dataset.to_csv('final_dataset.csv')
+final_dataset.to_csv('final_dataset1.csv')
 ```
 
 
-# Evaluate the performance of Amazon Comprehend
+## Evaluate the performance of Amazon Comprehend
 After looking at the data sample closely, we identify 17 clear misinterpretations of the sentiment. Most of the misinterpretation involves the unclarity between neutral and negative. For example, in one comment, the person states that: “No freedom! I can’t practice my right and freedom to express my ideas. They always remove my comments and freeze my account. No freedom anymore. Very controlling!” In this case, the comment seems extremely negative, but Amazon Comprehend identifies this statement as neutral with a confidence level of 0.93. To evaluate these misinterpretation, we created a new csv file, labeling correct outcome with 0 and incorrect outcome with 1. 
 
 ```
@@ -387,7 +391,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
-myfile = pd.read_csv('final_dataset2.csv')
+myfile = pd.read_csv('final_dataset1.csv')
 num_0 = list()
 num_1 =list()
 confidence_level_0 = list()
@@ -432,7 +436,7 @@ plt.show()
 
 The outcome shows that our observation is correct. Most of the time, Amazon Comprehend is confident even though it has a wrong interpretation.
 
-# What causes these misinterpretations?
+### What causes these misinterpretations?
 First, we create a column marking those wrong interpretations as 1 and the others as 0. Then we build a dictionary that corresponds to the number of comments that each word appears in. By identifying all the words that appear in at least 10 comments in our dataset, we gather the 15 words that contribute the most to the failure of Amazon Comprehend and the 15 words that could best free the sentiment analyze from errors.
 
 ```
@@ -442,9 +446,6 @@ import pandas as pd
 import nltk
 nltk.download('punkt')
 from nltk.stem import PorterStemmer
-
-
-
 
 def model_assessment(filename):
     stemming = PorterStemmer()
@@ -591,7 +592,7 @@ class Perceptron(object):
         return positive, negative
 ```
 
-## here we sort the 15 words that contribute to rightness the most, and the 15 words that contribute the most to falsity.
+Here we sort the 15 words that contribute to rightness the most, and the 15 words that contribute the most to falsity.
 
 ```
 def file_to_numpy(filename):
@@ -635,7 +636,7 @@ We'll get
 
 Most of the words that we get seem unnecessary for further analyze. We realize that the dataset has a limit scale, yet we are still happy with the effort that we paid on develping this method, and we could use it in the further when we have larger data to analyze. However, we do identify a few interesing words and syntaxes that requires further research.
 
-# Constructing our own dataset with controlled variables.
+## Constructing our own dataset with controlled variables.
 According to our data, we identified two words, “would” and “but”, and two syntaxes, exclamation mark and quotation mark.  Thus, we create our own dataset, controlling these variables. Here is the data that we create.
 
 ```
@@ -645,7 +646,7 @@ ownData
 
 ![Notebook instance settings](./own_data.png)
 
-## How does " " help?
+### How does " " help?
 
 ```
 ownData_1= ownData.iloc[3:9,:]
@@ -656,7 +657,7 @@ print(ownData_1)
 
 Based on the results for our own data, we believe that quotation marks help Amazon Comprehend to interpret sarcasm to a certain extent. Take the sentence "This latest update provides "freedom". Very controlling." as an example, when we added quotation marks for the word freedom, the confidence interval of the positive sentiment score reduced from 0.96 to 0.86. Although the result still did not reflect the reviewer's actual sentiment, it does show that Amazon Comprehend can interpret sarcasm to a certain extent through the usage of quotation marks. Additionally, another example showed a more significant change of the result: "Such a "good" update." The confidence level of the positive sentiment score dropped from 0.95 to 0.37. It still led to a positive sentiment score, but the information illustrated that Amazon Comprehend can detect sarcasm through quotation mark. The reason why both examples still resulted in positive sentiments is probably because Amazon Comprehend put more weights on the word "good" or "freedom" in these two cases. 
 
-## What about !
+### What about !
 
 ```
 ownData_2= ownData.iloc[15:19,:]
