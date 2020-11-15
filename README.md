@@ -411,6 +411,7 @@ plt.xlabel("review")
 plt.ylabel("confidence level")
 plt.legend(loc='lower right')
 ```
+![Notebook instance settings](./confidence_level.png)
 
 We notice that there are no significant difference between the two groups of outcome, which means that Amazon Comprehend is still confident enough, even when it commit a false interpretation. To testify this observation, we further conduct a T-test.
 
@@ -637,12 +638,16 @@ ownData = pd.read_csv('owndata2.csv')
 ownData
 ```
 
+![Notebook instance settings](./own_data.png)
+
 ## How does " " help?
 
 ```
 ownData_1= ownData.iloc[3:9,:]
 print(ownData_1)
 ```
+
+![Notebook instance settings](./own_data1.png)
 
 Based on the results for our own data, we believe that quotation marks help Amazon Comprehend to interpret sarcasm to a certain extent. Take the sentence "This latest update provides "freedom". Very controlling." as an example, when we added quotation marks for the word freedom, the confidence interval of the positive sentiment score reduced from 0.96 to 0.86. Although the result still did not reflect the reviewer's actual sentiment, it does show that Amazon Comprehend can interpret sarcasm to a certain extent through the usage of quotation marks. Additionally, another example showed a more significant change of the result: "Such a "good" update." The confidence level of the positive sentiment score dropped from 0.95 to 0.37. It still led to a positive sentiment score, but the information illustrated that Amazon Comprehend can detect sarcasm through quotation mark. The reason why both examples still resulted in positive sentiments is probably because Amazon Comprehend put more weights on the word "good" or "freedom" in these two cases. 
 
@@ -652,6 +657,8 @@ Based on the results for our own data, we believe that quotation marks help Amaz
 ownData_2= ownData.iloc[15:19,:]
 print(ownData_2)
 ```
+
+![Notebook instance settings](./own_data2.png)
 
 Now, let's take a closer look at the exclamation mark. It turned out that exclamation marks did not have much impact on the reviews that contained a strong sentiment word like "trash", as Amazon Comprehend can interpret very emotional words. However, when the word choice became more positive or neutral like the example: "Get our freedom back," exclamation marks tended to confuse Amazon Comprehend. As we can see, the confidence interval of negative sentiment dropped from 0.83 to 0.68. Supposedly, the confidence interval of the negative sentiment should increase; but in this case, it dropped a lot. We think that word choice is still a major determinant, but exclamation marks will lead to a more positive result as most of the time people use exclamation marks to express excitements. 
 
