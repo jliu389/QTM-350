@@ -448,6 +448,8 @@ First, we create a column marking those wrong interpretations as 1 and the other
 
 Here we extract 2 columns from `final_dataset2.csv` into `final_dataset3.csv` to perform the analysis. 
 
+![Notebook instance settings](./final_dataset3.png)
+
 ```
 import argparse
 import numpy as np
