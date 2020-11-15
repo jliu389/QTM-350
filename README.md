@@ -3,7 +3,7 @@
 ## Overview
 
 ## Architecture Diagram
-![Notebook instance settings](./Architecture Diagram.png)
+![Notebook instance settings](./Architecture_Diagram.png)
 
 ## Retrieving API Data
 ### Getting API and Access Token
