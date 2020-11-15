@@ -621,6 +621,11 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+We'll get 
+
+15 most positive words for binary dataset ['be', 'but', 'top', 'I', '“', '”', 'or', 'not', 'with', 'and', '!', 'now', 'the', 'my']
+15 most negative words for binary dataset ['from', 'are', 'time', 'facebook', 'post', 'of', 'it', '?', 'if', 'can', 'ha', 'left', 'app', 'have']
+
 
 Most of the words that we get seem unnecessary for further analyze. We realize that the dataset has a limit scale, yet we are still happy with the effort that we paid on develping this method, and we could use it in the further when we have larger data to analyze. However, we do identify a few interesing words and syntaxes that requires further research.
 
