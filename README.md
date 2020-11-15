@@ -374,3 +374,282 @@ final_dataset=pd.merge(df1, df2)
 final_dataset=final_dataset[['review', 'sentiment', 'mixed', 'negative', 'neutral', 'positive']]
 final_dataset.to_csv('final_dataset.csv')
 ```
+
+
+# Evaluate the performance of Amazon Comprehend
+After looking at the data sample closely, we identify 17 clear misinterpretations of the sentiment. Most of the misinterpretation involves the unclarity between neutral and negative. For example, in one comment, the person states that: “No freedom! I can’t practice my right and freedom to express my ideas. They always remove my comments and freeze my account. No freedom anymore. Very controlling!” In this case, the comment seems extremely negative, but Amazon Comprehend identifies this statement as neutral with a confidence level of 0.93. To evaluate these misinterpretation, we created a new csv file, labeling correct outcome with 0 and incorrect outcome with 1. 
+
+```
+import statistics
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy import stats
+
+myfile = pd.read_csv('final_dataset2.csv')
+num_0 = list()
+num_1 =list()
+confidence_level_0 = list()
+confidence_level_1 = list()
+```
+
+### Plotting the outcomes.
+Then we plot the confidnece levels with two colors to look at them clearly.
+
+```
+for i in range (myfile.shape[0]):
+    if myfile.iloc[i][7] == 0:
+        num_0.append(i)
+        confidence_level_0.append( max(myfile.iloc[i][3],myfile.iloc[i][4],myfile.iloc[i][5],myfile.iloc[i][6]))
+    else:
+        num_1.append(i)
+        confidence_level_1.append( max(myfile.iloc[i][3],myfile.iloc[i][4],myfile.iloc[i][5],myfile.iloc[i][6]))
+
+plt.plot(num_0,confidence_level_0,'ro',label="correct")
+plt.plot(num_1,confidence_level_1,'bo',label = "problematic")
+plt.title("Does Amazon Comprehend Hesitate?")
+plt.xlabel("review")
+plt.ylabel("confidence level")
+plt.legend(loc='lower right')
+```
+
+We notice that there are no significant difference between the two groups of outcome, which means that Amazon Comprehend is still confident enough, even when it commit a false interpretation. To testify this observation, we further conduct a T-test.
+
+## Conducting a T-test between misinterpretations and the sample data.
+
+```
+mean_0 = statistics.mean(confidence_level_0)
+mean_1 = statistics.mean(confidence_level_1)
+
+t_score, p_value = stats.ttest_ind(confidence_level_0,confidence_level_1, equal_var = False)
+print("t score:", t_score)
+print("p value:", p_value)
+
+plt.show()
+```
+
+The outcome shows that our observation is correct. Most of the time, Amazon Comprehend is confident even though it has a wrong interpretation.
+
+# What causes these misinterpretations?
+First, we create a column marking those wrong interpretations as 1 and the others as 0. Then we build a dictionary that corresponds to the number of comments that each word appears in. By identifying all the words that appear in at least 10 comments in our dataset, we gather the 15 words that contribute the most to the failure of Amazon Comprehend and the 15 words that could best free the sentiment analyze from errors.
+
+```
+import argparse
+import numpy as np
+import pandas as pd
+import nltk
+nltk.download('punkt')
+from nltk.stem import PorterStemmer
+
+
+
+
+def model_assessment(filename):
+    stemming = PorterStemmer()
+    myfile = pd.read_csv('final_dataset1.csv')
+    my_data = myfile["review"]
+    rows = myfile.shape[0]
+    num_reviews = rows
+    data = list()
+    r = ["I", "and", "to", "a" , ",", "." , "of" , "is" , "the","it", "you"]
+    for i in range (num_reviews):
+        word = list(nltk.word_tokenize(my_data[i])) ## split the comments into words
+
+        for k in r:
+            if k in word:
+                word.remove(k)
+
+        data.append([stemming.stem(w) for w in word]) ## delete stems such as "ing" and "ed"
+
+    data = np.array(data)
+    y = myfile["label"]
+
+    xFeat = data
+
+    return xFeat, y ## we get the further cleaned dataset consists of all the words in their stem form
+
+
+def build_vocab_map(mydata): ## In this function, we identify all the words that appeared at least ten times in our dataset
+    num_comment = len(mydata)
+    vocab_all = {} ## vocab map for all the words
+    vocab_10 = {} ## vocab map for words frequency bigger than 10
+    vocab_boolean = {}  ## check if the word updated for this comment
+
+    for i in range(num_comment):
+        txt = mydata[i]
+        for j in txt:
+            if j not in vocab_all.keys(): ## if the word never appeared, update directly
+                vocab_all.update({j : 1})
+
+            else:
+                if j not in vocab_boolean.keys(): ## if the word appear in the current comment for the first time
+                    vocab_boolean.update({j:True}) ## set the boolean true
+
+                if vocab_boolean[j] is True: ## if it's the first time appeared in this comment
+                    vocab_all.update({j: vocab_all[j]+1}) ## update in the map
+
+                    if vocab_all[j] > 10:
+                        vocab_10.update({j: vocab_all[j]})
+
+                    vocab_boolean.update({j: False}) ## set the boolean false to indicate it already updated
+
+        vocab_boolean.clear() ## clean the boolean dictionary as finishing one comment
+
+    return vocab_10 
+
+
+def construct_binary(mydata,vocab_map): ## For each comment, we transform it into a feature vector, with 1 and 0.
+    lines = len(mydata)
+    binary_data = list()
+    for i in range(lines):
+        txt = mydata[i]
+        comment_dict = {}
+        comment_binary = list()
+        for word in txt:
+            comment_dict.update({word:0})
+        for key in vocab_map:
+            if key in comment_dict.keys():
+                comment_binary.append(1)
+            else:
+                comment_binary.append(0)
+        binary_data.append(comment_binary)
+
+    return binary_data 
+```
+
+Then we transfer text data into numerical data to enable the computer to calculate.
+
+```
+def main():
+    """
+    Main file to run from the command line.
+    """
+    # set up the program to take in arguments from the command line
+    
+    xFeat, y = model_assessment("final_dataset1.csv")
+    vocab_map = build_vocab_map(xFeat)
+    binary = construct_binary(xFeat, vocab_map)
+
+
+    y = pd.DataFrame(y, columns=['label'])
+
+    y.to_csv("y.csv", index=False)
+
+    binary = pd.DataFrame(binary)
+    binary.columns = list(vocab_map.keys())
+    binary.to_csv("binary.csv", index=False)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Here we obtain two csv files (binary.csv and y.csv). With these files, we could further calculate the weight of each word on contributing to the correctness of sentiment analyze.
+
+```
+class Perceptron(object):
+    mEpoch = 1000  # maximum epoch size
+    w = None       # weights of the perceptron
+
+    def __init__(self, epoch):
+        self.mEpoch = epoch
+
+    def train(self, xFeat, y):
+        trainStats = {}
+        rows, cols = xFeat.shape
+        self.w = np.zeros(cols+1)
+
+        for epoch in range(self.mEpoch):
+            mistake = 0
+            for row, label in zip(xFeat, y):
+                prediction = np.dot(self.w[1:], row) + self.w[0]
+                if prediction >= 0:
+                    prediction = 1
+                else:
+                    prediction = 0
+                self.w[1:] += (label - prediction) * row
+                self.w[0] += label - prediction
+                if prediction != label:
+                    mistake =  mistake + 1
+
+            trainStats.update({epoch+1: mistake})
+            if mistake == 0:
+                break
+
+        return trainStats
+
+
+    def getWeight(self, xFeat):
+        weight = self.w[1:]
+        zipped = list(zip(weight,xFeat))
+        positive = sorted(zipped, key=lambda x: x[0],reverse= True)[0:14]
+        positive = [lis[1] for lis in positive]
+        negative = sorted(zipped, key=lambda x: x[0],reverse= False)[0:14]
+        negative = [lis[1] for lis in negative]
+        return positive, negative
+## here we sort the 15 words that contribute to rightness the most, and the 15 words that contribute the most to falsity.
+
+def file_to_numpy(filename):
+    """
+    Read an input file and convert it to numpy
+    """
+    df = pd.read_csv(filename)
+    return df.to_numpy()
+```
+
+After a long process of setting up data and functions, we could finally test our Facebook data and find out those words with significan weight.
+
+```
+def main():
+    """
+    Main file to run from the command line.
+    """
+  
+    binary = file_to_numpy("binary.csv")
+    binary_df = pd.read_csv("binary.csv")
+    y = file_to_numpy("y.csv")
+    np.random.seed(334)
+
+    model_binary = Perceptron(100)
+    model_binary.train(binary, y)
+
+    positive_binary, negative_binary = model_binary.getWeight(binary_df)
+    print("15 most positive words for binary dataset", positive_binary)
+    print("15 most negative words for binary dataset", negative_binary)
+
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Most of the words that we get seem unnecessary for further analyze. We realize that the dataset has a limit scale, yet we are still happy with the effort that we paid on develping this method, and we could use it in the further when we have larger data to analyze. However, we do identify a few interesing words and syntaxes that requires further research.
+
+# Constructing our own dataset with controlled variables.
+According to our data, we identified two words, “would” and “but”, and two syntaxes, exclamation mark and quotation mark.  Thus, we create our own dataset, controlling these variables. Here is the data that we create.
+
+```
+ownData = pd.read_csv('owndata2.csv')
+ownData
+```
+
+## How does " " help?
+
+```
+ownData_1= ownData.iloc[3:9,:]
+print(ownData_1)
+```
+
+Based on the results for our own data, we believe that quotation marks help Amazon Comprehend to interpret sarcasm to a certain extent. Take the sentence "This latest update provides "freedom". Very controlling." as an example, when we added quotation marks for the word freedom, the confidence interval of the positive sentiment score reduced from 0.96 to 0.86. Although the result still did not reflect the reviewer's actual sentiment, it does show that Amazon Comprehend can interpret sarcasm to a certain extent through the usage of quotation marks. Additionally, another example showed a more significant change of the result: "Such a "good" update." The confidence level of the positive sentiment score dropped from 0.95 to 0.37. It still led to a positive sentiment score, but the information illustrated that Amazon Comprehend can detect sarcasm through quotation mark. The reason why both examples still resulted in positive sentiments is probably because Amazon Comprehend put more weights on the word "good" or "freedom" in these two cases. 
+
+## What about !
+
+```
+ownData_2= ownData.iloc[15:19,:]
+print(ownData_2)
+```
+
+Now, let's take a closer look at the exclamation mark. It turned out that exclamation marks did not have much impact on the reviews that contained a strong sentiment word like "trash", as Amazon Comprehend can interpret very emotional words. However, when the word choice became more positive or neutral like the example: "Get our freedom back," exclamation marks tended to confuse Amazon Comprehend. As we can see, the confidence interval of negative sentiment dropped from 0.83 to 0.68. Supposedly, the confidence interval of the negative sentiment should increase; but in this case, it dropped a lot. We think that word choice is still a major determinant, but exclamation marks will lead to a more positive result as most of the time people use exclamation marks to express excitements. 
+
+## Conclusion
+
+According to our own data, we find that the word "would" and "but" have limited or no impact on the confidence interval of the sentiment score that Amazon Comprehend generate, while puntuations, like quotation marks and exclamation marks, tend to have certain impact on the results.  The reason why "would" and "but" do not have any impact is that these two words are very neutral. Amazon Comprehend are more capable of interpretating emotional words. From the results, we can also tell that Amazon Comprehend probably puts more weights on words with strong sentiments than on syntaxes.
