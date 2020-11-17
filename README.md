@@ -1,7 +1,7 @@
 # Evaluating Amazon Machine Learning Service -- Amazon Comprehend Using Facebook App Reviews
 
 ## Overview
-
+Every business experiences the process of digging through reviews for products and extracting useful takeaways from these. Reviews are often hastily written, and emotionally charged, prone to grammatical errors and misuse of punctuation. In some instances, reviews can be very confusing. A product can have a very high rating, for example, “4.8/5 stars”, while simultaneously receiving a multitude of negative reviews from the reviewees. Our work aims to explore the relationship between ratings and the sentiment of reviews using the Natural Language Processing Service Amazon Comprehend. In this post, we show you how you can use Amazon Comprehend sentiment analysis to extract useful meaning from reviews. We explore how different word choice, sentence structure, and punctuation affect the sentiment score in the hopes of further understanding the different variables that affect the score. We start with an overview of Amazon Comprehend, then discuss the specific function that we are concerned with, discuss the effect that word choice, sentence structure, and punctuation have on the sentiment score, and then how our findings can be utilized to interpret product reviews.
 
 ## Architecture Overview
 ![Notebook instance settings](./Architecture_Diagram.png)
